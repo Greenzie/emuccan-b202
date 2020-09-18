@@ -1,6 +1,5 @@
-               
-              EMUC-B201 SocketCAN Driver and Uspace Tool 
 
+              EMUC-B202 SocketCAN Driver and Uspace Tool
 
 ===========================================================================
 Build Driver and Util
@@ -54,5 +53,43 @@ reported.
 root@host# emucd -F -s6 /dev/ttyACM0
 
 There cannot be two EMUCD daemon running with same TTY device. You must 
-kill the previous one before running a new one on same device
+kill the previous one before running a new one on same device.
 
+===========================================================================
+A note on /dev/tty devices
+===========================================================================
+
+Unfortunately, emucd_64 is hardcoded(!) to use a /ttyACM[0-9] which is terrible,
+so you must create a udev rule to put it at something hardcoded, in this case
+we chose /dev/ttyACM9 interface. This is terrible, but works for now.
+
+===========================================================================
+Debian and System Install
+===========================================================================
+
+This version of the library also includes a debianization which will build
+a package and install it on Ubuntu systems.
+
+To build the library and create the repo use:
+
+* `make clean`
+* `export KERNEL_VER=$(uname -r)` # 5.3.7nlb
+* `export KERNEL_SRC=/usr/src/linux-headers-$KERNEL_VER/`
+* `make`
+
+This will generate two files, `emucd_64` (a userspace binary) and
+`emuc2socketcan.ko` (a kernel module). The latter needs be rebuilt for each
+kernel (even new configurations of the same kernel version), but the former
+should be reusable.
+
+To build the debian package, run:
+
+* `mkdir build`
+* `cd build`
+* `cmake ..`
+* `make`
+* `cpack`
+
+You should now have a debian called emuccan-b202_-1.deb.
+
+The 1 is a version you can bump inside CmakeLists.txt.
