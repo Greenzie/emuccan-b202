@@ -1,0 +1,21 @@
+[Unit]
+Description=EMUC-B202 CAN Bus SocketCAN daemon and interfaces
+# We need to wait until /dev/ttyACM9 comes online, see udev rule for details
+BindsTo=dev-ttyACM9.device
+After=dev-ttyACM9.device
+
+[Service]
+# emucd daemonizes itself (i.e. forks)
+Type=forking
+# emucd is hardcoded(!) to use /ttyACM[0-9] which is terrible, so we have
+# created a udev rule to put it at /dev/ttyACM9 interface. This is
+# terrible, but works for now.
+ExecStart=/usr/bin/emucd_64 -s9 /dev/ttyACM9 can0 can1
+ExecStartPost=/sbin/ip link set can0 up qlen 1000
+ExecStartPost=/sbin/ip link set can1 up qlen 1000
+ExecStop=/usr/bin/pkill -2 emucd_64
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

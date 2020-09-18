@@ -1,0 +1,6 @@
+# Unfortunately, we cannot use a symlink fancy name because the library that
+# uses this rule is hardcoded to only accept /dev/ttyACM[0-9]. Yup. Go figure.
+# So we hardcode it to /dev/ttyACM9. Sigh. If we had our way, it would be named
+# /dev/greenzie_emuc_b201_canbus but we can't have it our way.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="0205", \
+  MODE="0660", GROUP="dialout", SYMLINK+="ttyACM9", TAG+="systemd"
