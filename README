@@ -32,8 +32,8 @@ project 'can-utils' (https://github.com/linux-can/can-utils).
 You can specified the CAN speed for two channels when execute 'emucd' 
 daemon, type 'emucd -h' for help. 
 
-root@host# emucd -s6 /dev/ttyACM0  (500 KBPS on both channel)
-root@host# emucd -s34 /dev/ttyACM0 (50 KBPS on ch1, 125 KBPS on ch2)
+root@host# emucd -s6 /dev/ttyACM0  (250 KBPS on both channel)
+root@host# emucd -s45 /dev/ttyACM0 (100 KBPS on ch1, 125 KBPS on ch2)
 
 
 ===========================================================================
@@ -90,6 +90,7 @@ To build the debian package, run:
 * `make`
 * `cpack`
 
-You should now have a debian called emuccan-b202_-1.deb.
+You should now have a debian called emuccan-b202_2.7.1-1.deb.
 
-The 1 is a version you can bump inside CmakeLists.txt.
+The trailing -1 is a version you can bump inside CMakeLists.txt when
+rebuilding the same source for a new kernel version.
