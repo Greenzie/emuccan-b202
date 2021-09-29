@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-project(emuccan-b202 VERSION 2.7
+project(emuccan-b202
+  VERSION 2.7.1
   DESCRIPTION "EMUC CAN B202 SocketCAN driver and kernel module"
   LANGUAGES C)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -53,14 +54,20 @@ if (IS_DIRECTORY /lib/systemd/system)
   install(FILES emuccan.service DESTINATION /lib/systemd/system)
 endif()
 
+# install environment file
+if (IS_DIRECTORY /etc/default)
+  install(FILES emuccan.default DESTINATION /etc/default RENAME emuccan)
+endif()
+
 # Increment this for each rebuild (i.e. new kernel) using the same upstream ver
-set(CPACK_DEBIAN_PACKAGE_RELEASE "2")
+set(CPACK_DEBIAN_PACKAGE_RELEASE "1")
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_CONTACT "cbq@greenzie.com")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "EMUC CAN B202 module + userspace")
 set(CPACK_DEBIAN_PACKAGE_SECTION "kernel")
-set(CPACK_DEBIAN_FILE_NAME "${CMAKE_PROJECT_NAME}_${CMAKE_PROJECT_VERSION}-${CPACK_DEBIAN_PACKAGE_RELEASE}.deb")
+set(CPACK_DEBIAN_FILE_NAME "${CMAKE_PROJECT_NAME}_${PROJECT_VERSION}-${CPACK_DEBIAN_PACKAGE_RELEASE}.deb")
+set(CPACK_DEBIAN_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_DEBIAN_PACKAGE_DEBUG YES)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${CMAKE_CURRENT_SOURCE_DIR}/postinst)
 INCLUDE(CPack)
