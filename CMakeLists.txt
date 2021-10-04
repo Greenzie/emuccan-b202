@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(emuccan-b202
-  VERSION 2.7.1
+  VERSION 2.7.2
   DESCRIPTION "EMUC CAN B202 SocketCAN driver and kernel module"
   LANGUAGES C)
 set(CMAKE_CXX_EXTENSIONS OFF)
