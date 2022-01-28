@@ -67,8 +67,12 @@ a package and install it on Ubuntu systems.
 To build the library and create the repo use:
 
 * `make clean`
-* `export KERNEL_VER=$(uname -r)` # 5.3.7nlb
-* `export KERNEL_SRC=/usr/src/linux-headers-$KERNEL_VER/`
+* Bionic-Melodic:
+  * `export KERNEL_VER=$(uname -r)` # 5.3.7nlb
+* Focal-Noetic (Stock Kernel)
+  * `apt install linux-headers-5.4.0-96-generic` # This can change depending on which kernel you want to build
+  * `export KERNEL_VER=5.4.0-96-generic` #stock kernel
+* `export KERNEL_SRC=/usr/src/linux-headers-${KERNEL_VER}/`
 * `make`
 
 This will generate two files, `emucd_64` (a userspace binary) and
