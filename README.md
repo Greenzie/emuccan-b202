@@ -3,15 +3,15 @@
 ## Build Driver and Util
 
 Please install kernel development packages on your machine and simply
-type 'make' command in root folder of this packge.
+type 'make' command in root folder of this package.
 
 There should be two output files:
 - src/emuccan.ko : kernel driver of emuc socket can
-- src/emucd      : user-space tool for enable emuc socket can
+- src/emucd      : user-space tool for enabling emuc socket can
 
 ## Usage and Example
 
-Here is a example to use emuccan socket CAN.
+Here is an example to use emuccan socket CAN.
 ```
 root@host# insmod emuccan.ko
 root@host# emucd -s6 ttyACM0 can0 can1
@@ -21,10 +21,10 @@ root@host# cansend can0 5A1#11.22.33.44.55.66.77.88
 root@host# candump can1
 ```
 
-The detail usage of 'cansend' and 'candump', please refer the open source
+The detail usage of 'cansend' and 'candump', please refer to the open source
 project 'can-utils' (https://github.com/linux-can/can-utils).
 
-You can specified the CAN speed for two channels when execute 'emucd'
+You can specify the CAN speed for two channels when execute 'emucd'
 daemon, type 'emucd -h' for help.
 
 ```
@@ -43,7 +43,7 @@ root@host# tail -n 100 /var/log/syslog (Ubuntu)
 root@host# tail -n 100 /var/log/message (CentOS)
 ```
 
-Or, you can try to run 'emucd' in foreground to see if there is any error
+Or, you can try to run 'emucd' in the foreground to see if there is any error
 reported.
 
 ```
@@ -51,13 +51,13 @@ root@host# emucd -F -s6 /dev/ttyACM0
 ```
 
 There cannot be two EMUCD daemon running with same TTY device. You must
-kill the previous one before running a new one on same device.
+kill the previous one before running a new one on the same device.
 
 ## A note on /dev/tty devices
 
 Unfortunately, emucd_64 is hardcoded(!) to use a /ttyACM[0-9] which is terrible,
 so you must create a udev rule to put it at something hardcoded, in this case
-we chose /dev/ttyACM9 interface. This is terrible, but works for now.
+we chose /dev/ttyACM9 interface. This is terrible but works for now.
 
 ## Debian and System Install
 
