@@ -32,7 +32,7 @@ root@host# emucd -s6 /dev/ttyACM0  (250 KBPS on both channel)
 root@host# emucd -s45 /dev/ttyACM0 (100 KBPS on ch1, 125 KBPS on ch2)
 ```
 
-## Trubleshooting
+## Troubleshooting
 
 If the can device did not show up after 'emucd' is executed. Please check
 your system log to see if there is any error message reported by emuccan
@@ -53,11 +53,14 @@ root@host# emucd -F -s6 /dev/ttyACM0
 There cannot be two EMUCD daemon running with same TTY device. You must
 kill the previous one before running a new one on same device.
 
-## A note on /dev/tty devices
+## A note on device names
 
-Unfortunately, emucd_64 is hardcoded(!) to use a /ttyACM[0-9] which is terrible,
-so you must create a udev rule to put it at something hardcoded, in this case
-we chose /dev/ttyACM9 interface. This is terrible, but works for now.
+Unfortunately, emucd_64 is hardcoded(!) to only accept certain device names
+defined in an extern variable called comports (search inside
+lib_emuc2_64.a object). Yup. Go figure. So we hardcode it to `/dev/ttyCAN0`
+for now. Even worse, we used to use /dev/ttyACM9 but that was causing issues
+with un-plugging and replugging enough tty devices that our symlink was
+interferring with the dynamic kernel defined names (on the 10th replug).
 
 ## Debian and System Install
 
