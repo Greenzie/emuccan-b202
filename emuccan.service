@@ -9,10 +9,16 @@ After=dev-ttyCAN0.device
 Type=forking
 # Load Environment variables for speed
 EnvironmentFile=/etc/default/emuccan
+# The InnoDisk EMUC start.sh and end.sh scripts do modprobe and rmmod as part
+# of the starting and stopping process. And unfortunately it works. If you do
+# not rmmod and modprobe on a restart (and sleep), it fails to restart.
+ExecStartPre=-/usr/sbin/modprobe emuc2socketcan
 ExecStart=/usr/bin/emucd_64 -s${EMUCCAN_SPEED} /dev/ttyCAN0 can0 can1
 ExecStartPost=/sbin/ip link set can0 up qlen 1000
 ExecStartPost=/sbin/ip link set can1 up qlen 1000
 ExecStop=/usr/bin/pkill -2 emucd_64
+ExecStop=/usr/bin/sleep 0.2
+ExecStop=-/usr/sbin/rmmod emuc2socketcan
 Restart=always
 RestartSec=5
 
