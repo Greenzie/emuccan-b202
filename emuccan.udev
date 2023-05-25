@@ -1,6 +1,12 @@
 # Unfortunately, we cannot use a symlink fancy name because the library that
-# uses this rule is hardcoded to only accept /dev/ttyACM[0-9]. Yup. Go figure.
-# So we hardcode it to /dev/ttyACM9. Sigh. If we had our way, it would be named
+# uses this rule is hardcoded to only accept certain device names defined in
+# an extern variable called comports (search inside lib_emuc2_64.a object).
+# Yup. Go figure. So we hardcode it to /dev/ttyCAN0 for now.
+# Even worse, we used to use /dev/ttyACM9 but that was causing issues with
+# un-plugging and replugging enough tty devices that our symlink was
+# interferring with the dynamic kernel defined names (on the 10th replug).
+# Sigh. If we had our way, it would be named
 # /dev/greenzie_emuc_b201_canbus but we can't have it our way.
+# So /dev/tty/CAN0 it is for now:
 SUBSYSTEM=="tty", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="0205", \
-  MODE="0660", GROUP="dialout", SYMLINK+="ttyACM9", TAG+="systemd"
+  MODE="0660", GROUP="dialout", SYMLINK+="ttyCAN0", TAG+="systemd"

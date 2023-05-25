@@ -67,7 +67,7 @@ if (IS_DIRECTORY /etc/default)
 endif()
 
 # Increment this for each rebuild (i.e. new kernel) using the same upstream ver
-set(CPACK_DEBIAN_PACKAGE_RELEASE "2")
+set(CPACK_DEBIAN_PACKAGE_RELEASE "3")
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_CONTACT "cbq@greenzie.com")

@@ -1,21 +1,24 @@
 [Unit]
 Description=EMUC-B202 CAN Bus SocketCAN daemon and interfaces
-# We need to wait until /dev/ttyACM9 comes online, see udev rule for details
-BindsTo=dev-ttyACM9.device
-After=dev-ttyACM9.device
+# We need to wait until /dev/ttyCAN0 comes online, see udev rule for details
+BindsTo=dev-ttyCAN0.device
+After=dev-ttyCAN0.device
 
 [Service]
 # emucd daemonizes itself (i.e. forks)
 Type=forking
 # Load Environment variables for speed
 EnvironmentFile=/etc/default/emuccan
-# emucd is hardcoded(!) to use /ttyACM[0-9] which is terrible, so we have
-# created a udev rule to put it at /dev/ttyACM9 interface. This is
-# terrible, but works for now.
-ExecStart=/usr/bin/emucd_64 -s${EMUCCAN_SPEED} /dev/ttyACM9 can0 can1
+# The InnoDisk EMUC start.sh and end.sh scripts do modprobe and rmmod as part
+# of the starting and stopping process. And unfortunately it works. If you do
+# not rmmod and modprobe on a restart (and sleep), it fails to restart.
+ExecStartPre=-/usr/sbin/modprobe emuc2socketcan
+ExecStart=/usr/bin/emucd_64 -s${EMUCCAN_SPEED} /dev/ttyCAN0 can0 can1
 ExecStartPost=/sbin/ip link set can0 up qlen 1000
 ExecStartPost=/sbin/ip link set can1 up qlen 1000
 ExecStop=/usr/bin/pkill -2 emucd_64
+ExecStop=/usr/bin/sleep 0.2
+ExecStop=-/usr/sbin/rmmod emuc2socketcan
 Restart=always
 RestartSec=5
 
