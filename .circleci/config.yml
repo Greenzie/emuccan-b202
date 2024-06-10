@@ -3,45 +3,26 @@ version: 2.1
 orbs:
   greenzie: greenzie/build_and_publish_debs@dev:clone_submodules2
 
+jobs:
+  debian_dkms_build:
+    executor: greenzie/debianize_amd64
+    steps:
+      - checkout
+      - run:
+          name: "Generate Changelogs"
+          command: greenzie-release changelog -r "${ROS_DISTRO}"
+      - run:
+          name: "Package debs (debuild)"
+          command: GITHUB_WORKSPACE="$PWD" greenzie-dmks all
+      - store_artifacts:
+          path: /debians
+      - persist_to_workspace:
+          root: /debians
+          paths:
+            - '*'
+
 workflows:
   version: 2
-  pushbuild:
+  debian_dmks_build:
     jobs:
-      # Build jobs
-#      - greenzie/debian_build:
-#          name: "amd_debian_build"
-#          platform: amd64
-#          executor: greenzie/debianize_amd64
-#          clone_submodules: true
-#
-#      - greenzie/debian_build:
-#          name: "arm64_debian_build"
-#          platform: arm64
-#          executor: greenzie/debianize_arm64
-#          clone_submodules: true
-#
-#      # Deployment jobs
-#      - greenzie/debian_deploy_experimental:
-#          name: "deploy_amd64_greenzie"
-#          filters:
-#            branches:
-#              only:
-#                - noetic
-#          requires:
-#            - amd_debian_build
-      - debian_dmks_build:
-        executor: greenzie/debianize_amd64
-        steps:
-          - checkout
-          - run:
-              name: "Generate Changelogs"
-              command: greenzie-release changelog -r "${ROS_DISTRO}"
-          - run:
-              name: "Package debs (debuild)"
-              command: GITHUB_WORKSPACE="$PWD" greenzie-dmks all
-          - store_artifacts:
-              path: /debians
-          - persist_to_workspace:
-              root: /debians
-              paths:
-                - '*'
+      - debian_dkms_build
