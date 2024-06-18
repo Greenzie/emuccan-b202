@@ -1,7 +1,14 @@
 version: 2.1
 
 orbs:
-  greenzie: greenzie/build_and_publish_debs@dev:clone_submodules2
+  greenzie: greenzie/build_and_publish_debs@0.0.5
+
+root_directory: &root_directory
+  working_directory: /
+
+load_artifacts: &load_artifacts
+  attach_workspace:
+    at: /tmp/debians
 
 jobs:
   debian_dkms_build:
@@ -13,13 +20,39 @@ jobs:
           command: greenzie-release changelog -r "${ROS_DISTRO}"
       - run:
           name: "Package debs (debuild)"
-          command: GITHUB_WORKSPACE="$PWD" greenzie-dmks all
+          command: |
+            # build is going to fail but it's needed to generate the debs
+            GITHUB_WORKSPACE="$PWD" greenzie-dkms mkdeb -d
+            cd /tmp/debians/ && tar cvf /tmp/debians/alldebs.tar *.deb
       - store_artifacts:
-          path: /debians
+          path: /tmp/debians
+          destination: pciusb381-debian-package
       - persist_to_workspace:
-          root: /debians
+          # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
+          # environment which is taken to be the root directory of the workspace.
+          root: /tmp/debians
+          # Must be relative path from root
           paths:
             - '*'
+
+  deploy_debian_package:
+    <<: *root_directory
+    docker:
+      - image: greenzie/aptly:2024-04-25-3.19.1-focal-noetic
+        auth:
+          username: $DOCKERHUB_GREENZIE_USERNAME
+          password: $DOCKERHUB_GREENZIE_PASSWORD
+    resource_class: small
+    steps:
+      - <<: *load_artifacts
+      # Adds the keys from the UI so we can SSH
+      - add_ssh_keys
+      - run:
+          name: Deploy to aptly.greenzie.com
+          environment:
+            SERVER_HOSTNAME: aptly.greenzie.com
+          command: |
+            aptly repo deploy -r "experimental" -n "${CIRCLE_BUILD_NUM}" -p "/tmp/debians/"
 
 workflows:
   version: 2
@@ -27,3 +60,14 @@ workflows:
     jobs:
       - debian_dkms_build:
           context: GREENZIE
+      - deploy_debian_package:
+          context:
+            - GREENZIE
+#          filters:
+#            branches:
+#              only:
+#                - main # Experimental
+#                - /^\d+\.\d+/ # Matches tags like 1.0, 1.1, 2.0, etc. Stable releases
+#                - /^release-candidate-v.*/ # Matches tags like release-candidate-v1.0, release-candidate-v1.1, etc. Release candidates.
+          requires:
+            - debian_dkms_build
