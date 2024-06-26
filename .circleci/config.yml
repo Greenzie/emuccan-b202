@@ -3,6 +3,11 @@ version: 2.1
 orbs:
   greenzie: greenzie/build_and_publish_debs@0.0.5
 
+parameters:
+  filter_branch:
+    type: string
+    default: main
+
 root_directory: &root_directory
   working_directory: /
 
@@ -66,11 +71,9 @@ workflows:
       - deploy_debian_package:
           context:
             - GREENZIE
-#          filters:
-#            branches:
-#              only:
-#                - main # Experimental
-#                - /^\d+\.\d+/ # Matches tags like 1.0, 1.1, 2.0, etc. Stable releases
-#                - /^release-candidate-v.*/ # Matches tags like release-candidate-v1.0, release-candidate-v1.1, etc. Release candidates.
+          filters:
+            branches:
+              only:
+                - << pipeline.parameters.filter_branch >>
           requires:
             - debian_dkms_build
