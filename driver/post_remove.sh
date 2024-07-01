@@ -5,6 +5,7 @@ MODULE_NAME="emuc2socketcan"
 KERNEL_VERSION=$(uname -r)
 
 if [ "$(grep -c "^${MODULE_NAME}" /proc/modules)" -ne 0 ]; then
+    sudo systemctl stop emuccan
     modprobe -r ${MODULE_NAME} || true
 fi
 
