@@ -88,7 +88,7 @@
  */
 /* module info. */
 /*=====================================================================*/
-MODULE_VERSION("v2.6");
+MODULE_VERSION("v2.6.1");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Innodisk EMUC-B202 CAN interface driver");
 MODULE_ALIAS("Innodisk EMUC-B202");

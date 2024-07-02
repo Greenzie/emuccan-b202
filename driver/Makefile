@@ -1,7 +1,8 @@
 CONFIG_MODULE_SIG = n
 Q                := @
 PWD              ?= $(shell pwd)
-KERNEL_SRC       ?= /lib/modules/`uname -r`/build
+KVERSION         ?= $(shell uname -r)
+KERNEL_SRC       ?= /lib/modules/$(KVERSION)/build
 INCLUDE_DIR      ?= $(PWD)/include
 CFILES           := main.c emuc_parse.c transceive.c
 TARGET           := emuc2socketcan.ko
