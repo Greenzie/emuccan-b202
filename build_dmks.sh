@@ -33,16 +33,6 @@ if ! dpkg-query -W -f='${Status}' debhelper 2>/dev/null | grep -q "install ok in
     sudo apt install -y debhelper
 fi
 
-# Check for kernel headers and install if missing
-# Check for specific linux-headers-generic version and install if missing
-if ! dpkg-query -W -f='${Status}' linux-headers-generic 2>/dev/null | grep -q "install ok installed"; then
-    echo "Installing linux-headers-generic"
-    sudo apt update
-    sudo apt install -y "linux-headers-generic"
-else
-    echo "Required linux-headers-generic version $REQUIRED_VERSION is already installed."
-fi
-
 echo "==> Preparing to use dkms to package the module..."
 # Ensure the module directory exists in /usr/src
 WORKSPACE="/usr/src/${MODULE_NAME}-${VERSION}"
@@ -57,28 +47,6 @@ if dkms status -m "$MODULE_NAME" -v "$VERSION" | grep -q "$VERSION"; then
 else
     sudo dkms add -m "$MODULE_NAME" -v "$VERSION"
 fi
-
-# Check if only one kernel headers are available
-LINUX_HEADERS=$(ls /usr/src/ | grep 'linux-headers-')
-if [ "$(echo "$LINUX_HEADERS" | wc -l)" -gt 1 ]; then
-    echo "==> Multiple kernel headers found. Please specify the version to use."
-    echo "==> Found kernel headers:"
-    echo "==> $LINUX_HEADERS"
-    if [ -z "$DKMS_KERNEL_SOURCE_DIR" ]; then
-        echo "==> WARNING: DKMS_KERNEL_SOURCE_DIR is not set."
-        echo "====> Set the DKMS_KERNEL_SOURCE_DIR environment variable to the desired kernel headers directory."
-        echo "====> Trying to use the last kernel headers directory: $LINUX_HEADERS"
-        DKMS_KERNEL_SOURCE_DIR="/usr/src/$(echo "$LINUX_HEADERS" | tail -n 1)"
-    fi 
-else
-    echo "==> Single kernel headers found."
-    # get the only kernel headers directory
-    DKMS_KERNEL_SOURCE_DIR=$(ls -d /usr/src/linux-headers-*)
-    export DKMS_KERNEL_SOURCE_DIR
-
-fi
-echo "==> Using kernel headers from: $DKMS_KERNEL_SOURCE_DIR"
-echo "==> Building the module..."
 
 # Create Debian package
 sudo dkms mkdeb -m "$MODULE_NAME" -v "$VERSION" --kernelsourcedir="$DKMS_KERNEL_SOURCE_DIR"
