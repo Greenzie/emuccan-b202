@@ -31,7 +31,7 @@ jobs:
             echo "$PWD"
             bash -x "$PWD/build_dmks.sh"    
       - store_artifacts:
-          path: $PWD/artifacts/
+          path: artifacts/
           destination: emuccan-debian-package
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
