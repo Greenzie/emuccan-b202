@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 PROJECT_DIR=${2:-$PWD}
 DRIVER_CODE_DIR=${1:-"$PROJECT_DIR/driver"}
@@ -50,7 +51,7 @@ sudo mkdir -p $WORKSPACE
 sudo cp -r "$DRIVER_CODE_DIR"/* "$WORKSPACE"
 
 
-# Step 1: Add the module
+# Add the module
 if dkms status -m "$MODULE_NAME" -v "$VERSION" | grep -q "$VERSION"; then
     echo "Module '$MODULE_NAME' already exists"
 else
@@ -78,14 +79,12 @@ else
 fi
 echo "==> Using kernel headers from: $DKMS_KERNEL_SOURCE_DIR"
 echo "==> Building the module..."
-set -e
-# Step 2: Build the module
-# sudo dkms build -m "$MODULE_NAME" -v "$VERSION" --kernelsourcedir="$DKMS_KERNEL_SOURCE_DIR"
-# Step 3: Create Debian package
-sudo dkms mkdeb -m "$MODULE_NAME" -v "$VERSION" --kernelsourcedir="$DKMS_KERNEL_SOURCE_DIR"
-set +e
 
-# Step 4 (Optional): Create artifact package
+# Create Debian package
+sudo dkms mkdeb -m "$MODULE_NAME" -v "$VERSION" --kernelsourcedir="$DKMS_KERNEL_SOURCE_DIR"
+
+
+#(Optional): Create artifact package
 SRC_DIR="/var/lib/dkms/${MODULE_NAME}/${VERSION}/deb/"
 DST_DIR="$PROJECT_DIR/artifacts"
 FILENAME="alldebs.tar"
@@ -110,7 +109,7 @@ UNPACK_DIR="unpacked_deb"
 rm -rf "$UNPACK_DIR/" || true
 
 echo "==> We have found the .deb package at $DEB_FILE"
-# Step 5: Unpack the .deb package
+# Unpack the .deb package
 if [ -f "$DEB_FILE" ]; then
     echo "==> Unpacking $DEB_FILE for modification..."
     mkdir -p "$UNPACK_DIR"
@@ -124,14 +123,12 @@ echo "==> We have unpacked the .deb package to $UNPACK_DIR"
 echo "==> Before adding files, the unpacked package structure is as follows:"
 ls "$UNPACK_DIR"
 echo "==> Now we will add the necessary files to the unpacked package."
-# Step 6: Add files to the unpacked package
+
 # Create necessary directories in unpacked package
 mkdir -p "$UNPACK_DIR/lib/systemd/system"
 mkdir -p "$UNPACK_DIR/lib/udev/rules.d"
 mkdir -p "$UNPACK_DIR/etc/modules-load.d"
 mkdir -p "$UNPACK_DIR/etc/default"
-
-set -e
 
 # Copy files into the unpacked structure
 ls "$PROJECT_DIR"
@@ -146,12 +143,12 @@ echo "==> After adding files, the unpacked package structure is as follows:"
 ls "$UNPACK_DIR"
 
 
+# Rebuild the .deb package with the added files
 echo "==> Now we will rebuild the .deb package with the added files."
-# Step 7: Rebuild the .deb package with the added files
 echo "==> Repacking the modified .deb package..."
 dpkg-deb -b "$UNPACK_DIR" "$DST_DIR/modified_${MODULE_NAME}_${VERSION}.deb"
 
-# Step 8: Clean up
+# Clean up
 rm -rf "$UNPACK_DIR"
 echo "==> Repackaging complete. Modified package located at $DST_DIR/modified_${MODULE_NAME}_${VERSION}.deb"
 echo "==> Replacing the original package with the modified package."
