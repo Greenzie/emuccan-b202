@@ -26,12 +26,10 @@ jobs:
       - run:
           name: "Package debs (debuild)"
           command: |
-            # build is going to fail but it's needed to generate the debs
             ls -lah
             pwd
             echo "$PWD"
-            bash -x build_dkms.sh
-            
+            bash -x "$PWD/build_dmks.sh"    
       - store_artifacts:
           path: $PWD/artifacts/
           destination: emuccan-debian-package
