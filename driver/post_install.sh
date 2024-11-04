@@ -24,4 +24,10 @@ echo "${MODULE_NAME}" | sudo tee /etc/modules-load.d/${MODULE_NAME}.conf
 
 depmod -a
 
+# Reload udev rules (from postinst)
+udevadm control --reload-rules && udevadm trigger
+
+# enable emuccan.service
+systemctl enable emuccan
+
 modprobe ${MODULE_NAME} || true
