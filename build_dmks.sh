@@ -37,7 +37,7 @@ echo "==> Preparing to use dkms to package the module..."
 # Ensure the module directory exists in /usr/src
 WORKSPACE="/usr/src/${MODULE_NAME}-${VERSION}"
 sudo rm -rf "$WORKSPACE"  # Remove if it exists
-sudo mkdir -p $WORKSPACE
+sudo mkdir -p "$WORKSPACE"
 sudo cp -r "$DRIVER_CODE_DIR"/* "$WORKSPACE"
 
 
@@ -52,10 +52,8 @@ fi
 sudo dkms mkdeb -m "$MODULE_NAME" -v "$VERSION" --kernelsourcedir="$DKMS_KERNEL_SOURCE_DIR"
 
 
-#(Optional): Create artifact package
 SRC_DIR="/var/lib/dkms/${MODULE_NAME}/${VERSION}/deb/"
 DST_DIR="$PROJECT_DIR/artifacts"
-FILENAME="alldebs.tar"
 if [ -d "$SRC_DIR" ]; then
     rm -rf "$DST_DIR" || true
     sudo mkdir -p "$DST_DIR"
@@ -74,7 +72,7 @@ echo "==> First, we will unpack the .deb package"
 DEB_FILE=$(find "$DST_DIR" -name "*.deb" | head -n 1)
 UNPACK_DIR="unpacked_deb"
 
-rm -rf "$UNPACK_DIR/" || true
+rm -rf "$UNPACK_DIR" || true
 
 echo "==> We have found the .deb package at $DEB_FILE"
 # Unpack the .deb package
