@@ -32,8 +32,7 @@ case "$1" in
       # reload udev rules, may have to reboot, sadly:
       udevadm control --reload-rules && udevadm trigger
 
-      # enable emuccan.service
-      systemctl enable emuccan
+ 
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
