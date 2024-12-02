@@ -27,6 +27,9 @@ depmod -a
 # Reload udev rules (from postinst)
 udevadm control --reload-rules && udevadm trigger
 
+# Reload systemd manager configuration as those has been changed
+systemctl daemon-reload
+
 # enable emuccan.service
 systemctl enable emuccan
 
